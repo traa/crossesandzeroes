@@ -6,7 +6,6 @@ function GamePlayer() {}
 GamePlayer.prototype.addPlayer = function(db, game_id) {
 
 	var player_count = db.get(table_name, {id: game_id});
-	console.log('player count', player_count);
 		
 	//if player can join
 

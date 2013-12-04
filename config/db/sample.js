@@ -72,6 +72,16 @@ module.exports = {
 			}
 
 		}
+	},
+
+	delete: function(key, opts) {
+		if (opts && opts.id) {
+			delete storage[key][opts.id];
+			storage[key].splice(opts.id,1);
+		} else {
+			delete storage[key];
+		}
+		
 	}
 
 };

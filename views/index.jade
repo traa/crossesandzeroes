@@ -5,8 +5,9 @@ block content
 	p Hi, dear user!
 	span Below you can see a list of games to play
 
-
-	if games.length
+	//empty game with id 0
+	if games.length > 1
+		//make a loop for games
 		p
 			a(href='/games/') My game!
 	else

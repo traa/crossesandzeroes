@@ -25,7 +25,8 @@ $(function() {
 
 	}
 
-	socket.emit('register_player', $('#game_id').val());
+	//registering player in database
+	socket.emit('register_player', $('#game_id').val(), $('#fieldsize').val());
 
 
 	$('#field td').on('click', function() {
@@ -34,9 +35,10 @@ $(function() {
 		console.log($(this).attr('id'), turns_enabled);
 		if (turns_enabled) {
 			socket.emit('turn', $(this).attr('id'), function(msg) {
-				if (msg == 'success') {
+				var numberPassed = !isNaN(Number(msg));
+				//if successfull turn or somebody won
+				if (msg == 'success' || (numberPassed && Number(msg) > 0) ) {
 
-					console.log(msg, player_shape[player_number], $(self));
 					$(self).html(player_shape[player_number]);
 
 				} 
@@ -100,6 +102,14 @@ $(function() {
 
 		turn(true);
 
+	});
+
+
+	socket.on('player_won', function(player) {
+		console.log(player);
+		turn(false);
+		turn_info.html('Player #'+player+' won! Use <a href="/">this link</a> to return on main page');
+		socket.disconnect()
 	});
 
 });

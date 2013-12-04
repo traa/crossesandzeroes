@@ -64,8 +64,7 @@ var passDB = function(req, res, next) {
 //db.create('games', {'id': 10, 'turns':['11es']});
 
 app.post('/create', passDB, function(req, res, next) {
-	var fieldsize = Number(req.body.fieldsize);
-	gameController.create(fieldsize, req, res, next);
+	gameController.create(req, res, next);
 });
 
 app.all('/', passDB, function(req, res, next) {
@@ -93,7 +92,7 @@ io.sockets.on('connection', function (socket) {
 
 
 
-  socket.on('register_player', function(game_id) {
+  socket.on('register_player', function(game_id, fieldsize) {
 
   		/**
   		* KNOWN BUG: when user refreshes page, he will be kicked from game
@@ -103,10 +102,11 @@ io.sockets.on('connection', function (socket) {
   		socket.get('player', function(error, value) {
 
   			var player_number = value;
+        var game_turns;
 
 
   			if (!player_number) {
-	  			socket.set('game_id', game_id);
+	  			socket.set('game', {id: game_id, fieldsize: fieldsize});
 		  		player_number = gamePlayerModel.addPlayer(db, game_id);
 		  		socket.set('player', player_number);
   			}
@@ -115,7 +115,10 @@ io.sockets.on('connection', function (socket) {
 
 
   			if(turnModel.turnAllowed(db, player_number, game_id)) {
-  				 socket.emit('start_turn', player_number, turnModel.getGameTurns(db, game_id));
+
+           game_turns = turnModel.getGameTurns(db, game_id);
+  				 socket.emit('start_turn', player_number, game_turns);
+
   			}
 
   		});
@@ -127,14 +130,27 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('turn', function(turn_id, callback) {
 
-  	socket.get('game_id', function(error, game_id) {
+  	socket.get('game', function(error, game) {
   		socket.get('player', function(error, player) {
 
-  			var successfullTurn = turnModel.addTurn(db, game_id, player, turn_id);
+  			var successfullTurn = turnModel.addTurn(db, game.id, player, turn_id, game.fieldsize);
+        var game_turns = turnModel.getGameTurns(db, game.id);
 
   			callback(successfullTurn);
 
-  			socket.broadcast.emit('start_turn', turnModel.nextPlayerNumber(player), turnModel.getGameTurns(db, game_id));
+         socket.broadcast.emit('start_turn', turnModel.nextPlayerNumber(player), game_turns);
+        //if passed a number of player, who won
+        if (!isNaN(Number(successfullTurn))) {
+          //broadcast to all clients
+          //@TODO: broadcast to all room members only
+           io.sockets.emit('player_won', successfullTurn);
+           //closing sockets and removing a game
+           socket.disconnect();
+
+           gameController.deleteGame({db: db}, game.id);
+        } 
+
+  			
 
   		});
   	});
