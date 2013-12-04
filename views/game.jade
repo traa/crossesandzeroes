@@ -1,0 +1,25 @@
+
+extends layout
+
+
+
+block content
+	script(src="/socket.io/socket.io.js")
+	script(src="/javascripts/g.js", type="text/javascript")
+	input(type="hidden", id="game_id", value="#{game_id}")
+
+	h2#player_number 
+	h1 Game with field size #{fieldsize}x#{fieldsize}
+	table#field
+		- iteration = 1;
+		- for (var x = 1; x <= fieldsize; x++)
+			tr
+				- for (var y = 1; y <= fieldsize; y++)
+					td(id="#{iteration}")
+					- iteration++;
+
+
+	div#turninfo Please wait for your turn
+
+
+

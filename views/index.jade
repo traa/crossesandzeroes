@@ -1,0 +1,18 @@
+extends layout
+
+block content
+
+	p Hi, dear user!
+	span Below you can see a list of games to play
+
+
+	if games.length
+		p
+			a(href='/games/') My game!
+	else
+		div But, unfortunately, we can't find any games, that you can play, so you can create a new one.
+		div
+			form(action="/create", method="post")
+				p Fill in size of field
+				input#fieldsize(type="text", name="fieldsize")
+				input#start(type="submit", value="Start game!")
