@@ -12,6 +12,7 @@ tmp/
 *.swp
 *~.nib
 local.properties
+node_modules/*/*
 .classpath
 .settings/
 .loadpath
