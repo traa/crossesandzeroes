@@ -16,4 +16,4 @@ Installation:
  * After page reloading in game, always player2 assigned, need to use sessions
  * Sockets broadcasting to all connected clients, needs to be only game room clients
  * All fields rerendered when user receives array of turns. Rerender only changed.
- *...and more :)
+ * ...and more, like validation messages and so on :)
