@@ -1,6 +1,8 @@
 crossesandzeroes
 ================
-Implementation of this truly legendary game for Innovation Group with Express.js and Socket.IO
+Implementation of this truly legendary game for Innovation Group with Express.js and Socket.IO.
+
+No database, instead of it app uses sample database wrapper, so if you want to switch, just tweak this wrapper.
 
 Installation:
 -------------
