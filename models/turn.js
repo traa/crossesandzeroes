@@ -48,16 +48,18 @@ Turn.prototype.addTurn = function(db, game_id, player, turn_id, fieldsize) {
 		if(this.checkCorrectTurnQueue(game_turns)) {
 			//check if game turns already exists
 			if(game_turns) {
+				//just check for array existence in current index
 				if (game_turns[player]) {
 					game_turns[player].push(turn_id);
 				} else {
 					game_turns[player] = [turn_id];
 				}
+
 				db.update(table_name, game_turns, {id: game_id});
 			} 
 			//it's a first turn
 			else {
-				//write turn of every player
+				//write turn of every player using indexes which equals number of player
 				turn_array[player] = [turn_id];
 				db.create(table_name, turn_array, {id: game_id});
 			}
@@ -100,7 +102,6 @@ Turn.prototype.turnIsPresent = function(game_turns, turn_id) {
 
 		if (result_array.indexOf(turn_id.toString()) != -1) {
 			present = true;
-			console.log('turnIsPresent2', result_array, turn_id, present);
 		}
 	}
 
@@ -109,7 +110,9 @@ Turn.prototype.turnIsPresent = function(game_turns, turn_id) {
 
 };
 
-
+/**
+* Check if player can make this turn by comparing existing number of turns
+**/
 Turn.prototype.checkCorrectTurnQueue = function(game_turns) {
 
 
@@ -138,11 +141,14 @@ Turn.prototype.checkCorrectTurnQueue = function(game_turns) {
 		}
 	}
 
-
 	return result[this.player];
 
 };
 
+/**
+* Helper function
+* used in sockets module
+**/
 Turn.prototype.turnAllowed = function(db, player, game_id) {
 
 	this.player = player;
@@ -153,7 +159,9 @@ Turn.prototype.turnAllowed = function(db, player, game_id) {
 
 };
 
-
+/**
+* @TODO: remove hardcoding to two players?
+**/
 Turn.prototype.nextPlayerNumber = function(player) {
 
 	return player == 1 ? 2 : 1;
@@ -161,6 +169,9 @@ Turn.prototype.nextPlayerNumber = function(player) {
 
 
 /**
+* Calculation of winning combos for any field size from 3 and more
+* checkWinningCombo(integer Side size, array Turns)
+*
 * example of field
 * 
 * 1 2 3 
@@ -182,7 +193,7 @@ Turn.prototype.checkWinningCombo = function(side, turns) {
 	/**
 	* usual turns array looks like [null, array Player1Turns, array Player2Turns] to allow referencing
 	* to values by index, which equals to player number.
-	* So it's length must be 3. If less, then second player hasn't made any turn.
+	* So it's length must be 3. If less, then second player hasn't made any turn and we don't need to check combinations.
 	**/
 	if (!this.turns) {
 		return player_won;
@@ -200,18 +211,21 @@ Turn.prototype.checkWinningCombo = function(side, turns) {
 		}
 	}
 
+
 	var winning_combos = [];
 
 	var maximium_number = this.side * this.side;
+	//horizontal combos
 	var tmp_combo_h = [],
+		//vertical combos
 		tmp_combo_v = [],
+		//diagonal combos
 		tmp_combo_d = [[], []],
 		str_combo_h = [];
 
 
-
+	//just one cycle
 	for(var i = 1; i <= maximium_number; i++) {
-		console.log('numver start', i);
 
 		//vertical combo (number = number of sides)
 		if (!tmp_combo_v[(i%this.side)]) {
@@ -254,7 +268,6 @@ Turn.prototype.checkWinningCombo = function(side, turns) {
 		if (i == maximium_number && (player_won = this.checkCombo(tmp_combo_h, str_combo_h)))  {
 			break;
 		}
-		console.log('numver end', i);
 	}
 
 	//returns 0 if nobody won, 1 or 2 if one of players won
@@ -274,15 +287,16 @@ Turn.prototype.checkCombo = function(array, value) {
 	var checking_data = [];
 	array.push(value);
 
-
+	//if second param is array, then we need to check it for needed size for winning combo
 	if (Object.prototype.toString.call( value ) === '[object Array]' && value.length == this.side) {
 		checking_data = value;
-		
-	} else if(array.length == this.side) {
+	} 
+	//in other case, checking first param
+	else if(array.length == this.side) {
 		checking_data = array;
 	}
 
-	
+	console.log('checking data', checking_data, array, value);
 	return this.compareTurns(checking_data);
 
 };
@@ -290,12 +304,22 @@ Turn.prototype.checkCombo = function(array, value) {
 
 Turn.prototype.compareTurns = function(array) {
 	var winner_player = 0;
+	var turns;
 
-	for (var i = 1; i< this.turns.length; i++) {
-		if (this.turns[i].compare(array) === true) {
-			console.log('equal', array, this.turns[i]);
-			winner_player = i;
-			break;
+	if (array.length) {
+
+	
+		//cycle over given turns for every player
+		for (var i = 1; i< this.turns.length; i++) {
+			turns = this.turns[i];
+
+			if (array.every(function(val) {
+				return turns.indexOf(val.toString()) >= 0;
+			})) {
+
+				winner_player = i;
+				break;
+			}
 		}
 	}
 

@@ -1,7 +1,7 @@
 {
   "name": "Crosses&Zeroes",
   "description": "Stunning and almost the best application in the living world",
-  "version": "0.0.1",
+  "version": "0.1.7",
   "private": true,
   "scripts": {
     "start": "node app.js"

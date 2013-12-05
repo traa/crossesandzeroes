@@ -36,12 +36,16 @@ $(function() {
 	socket.emit('register_player', game_id, fieldsize);
 
 
+	/**
+	* Listener for cells
+	**/
 	$('#field td').on('click', function() {
 
 		var self = this;
-		console.log($(this).attr('id'), turns_enabled);
+
 		if (turns_enabled) {
 			socket.emit('turn', $(this).attr('id'), function(msg) {
+				console.log('message', msg);
 				var numberPassed = !isNaN(Number(msg));
 				//if successfull turn or somebody won
 				if (msg == 'success' || (numberPassed && Number(msg) > 0) ) {
@@ -59,7 +63,9 @@ $(function() {
 		}
 	});
 
-
+	/**
+	* Listener for "Finish the game" button
+	**/
 	finish_game_button.on('click', function() {
 		socket.emit('finish_game', function(url) {
 			turn_info.html('Removing game from database. Redirecting...');
@@ -70,6 +76,11 @@ $(function() {
 	});
 
 
+
+
+	/**
+	* Assigning the number to each player
+	**/
 	socket.on('player_number', function(data) {
 		if (!data) {
 			window.location.href = '/';
@@ -88,7 +99,9 @@ $(function() {
 
 	});
 
-
+	/**
+	* Signalling that player can start his turn
+	**/
 	socket.on('start_turn', function(player, turns) {
 
 		console.log(player, turns);
@@ -121,7 +134,9 @@ $(function() {
 
 	});
 
-
+	/**
+	* Signalling if one of players won the game
+	**/
 	socket.on('player_won', function(player) {
 		finish_game_button.hide();
 		turn(false);
@@ -129,7 +144,9 @@ $(function() {
 		socket.disconnect()
 	});
 
-
+	/**
+	* Signalling if another player pushed "finish the game" button
+	**/
 	socket.on('end_game', function(url) {
 		turn_info.html('Another player finished the game. Redirecting...');
 		setTimeout(function() {

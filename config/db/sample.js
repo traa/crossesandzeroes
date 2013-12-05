@@ -1,5 +1,8 @@
 
-
+/**
+* WRAPPER FOR DB IMITATION
+* contains sample implementation of CRUD operations with needed adaptation
+**/
 
 var storage = {
 

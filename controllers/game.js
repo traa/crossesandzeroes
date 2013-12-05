@@ -10,6 +10,9 @@ function GameController() {
 	this.model = new GameModel();
 }
 
+/**
+* INDEX PAGE
+**/
 GameController.prototype.list = function(req, res) {
 	var games = this.model.getGames(req);
 	res.render('index', {games: games});
@@ -25,7 +28,9 @@ GameController.prototype.create = function(req, res, next) {
 	var game_id = this.model.createGame(req, fieldsize);
 	res.redirect('/games/'+game_id);
 };
-
+/**
+* GAMES PAGE
+**/
 GameController.prototype.load = function(req, res, next) {
 	var game_id = Number(req.params.id);
 	var fieldsize = this.model.getFieldSize(req, game_id);
