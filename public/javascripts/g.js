@@ -45,7 +45,6 @@ $(function() {
 
 		if (turns_enabled) {
 			socket.emit('turn', $(this).attr('id'), function(msg) {
-				console.log('message', msg);
 				var numberPassed = !isNaN(Number(msg));
 				//if successfull turn or somebody won
 				if (msg == 'success' || (numberPassed && Number(msg) > 0) ) {
@@ -104,7 +103,6 @@ $(function() {
 	**/
 	socket.on('start_turn', function(player, turns) {
 
-		console.log(player, turns);
 
 		//because of we have an empty 0 index, so we must exclude it from total amount of player turns
 		var isTurnsPresent = turns ? (turns.length - 1) : 0;
