@@ -8,8 +8,9 @@ block content
 	//empty game with id 0
 	if games.length > 1
 		//make a loop for games
-		p
-			a(href='/games/') My game!
+		- for (var i = 1; i < games.length; i++)
+			p
+				a(href='/games/#{i}') Game ##{i}
 	else
 		div But, unfortunately, we can't find any games, that you can play, so you can create a new one.
 		div

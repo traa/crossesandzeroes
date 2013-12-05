@@ -8,6 +8,8 @@ block content
 	script(src="/javascripts/g.js", type="text/javascript")
 	input(type="hidden", id="game_id", value="#{game_id}")
 	input(type="hidden", id="fieldsize", value="#{fieldsize}")
+	img(src="/images/cross.png", id="cross", style="display:none;")
+	img(src="/images/zero.png", id="zero", style="display:none;")
 
 	h2#player_number 
 	h1 Game with field size #{fieldsize}x#{fieldsize}
@@ -21,6 +23,9 @@ block content
 
 
 	div#turninfo Please wait for your turn
+
+
+	input#finish_game(type="button", value="Finish the game")
 
 
 

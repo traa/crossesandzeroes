@@ -128,6 +128,23 @@ io.sockets.on('connection', function (socket) {
   });
 
 
+  socket.on('finish_game', function(callback) {
+    socket.get('game', function(error, game) {
+
+      var redirect_url = '/';
+
+      if (game) {
+
+         gameController.deleteGame({db: db}, game.id);
+         socket.broadcast.emit('end_game', redirect_url);
+         callback(redirect_url);
+         socket.disconnect();
+         
+      }
+    });
+  });
+
+
   socket.on('turn', function(turn_id, callback) {
 
   	socket.get('game', function(error, game) {

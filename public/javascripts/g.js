@@ -4,13 +4,20 @@ $(function() {
 	var socket = io.connect('http://localhost');
 	var player_number_el = $('#player_number');
 	var turn_info = $('#turninfo');
+	var finish_game_button = $('#finish_game');
+
+	var game_id =  $('#game_id').val();
+	var fieldsize = $('#fieldsize').val();
+
+	var cross_img = $('#cross');
+	var zero_img = $('#zero');
 
 	//default value
 	var player_number = 1;
 
 	var player_shape = {
-		1: 'X',
-		2: '0'
+		1: cross_img,
+		2: zero_img
 	};
 
 
@@ -26,7 +33,7 @@ $(function() {
 	}
 
 	//registering player in database
-	socket.emit('register_player', $('#game_id').val(), $('#fieldsize').val());
+	socket.emit('register_player', game_id, fieldsize);
 
 
 	$('#field td').on('click', function() {
@@ -39,7 +46,7 @@ $(function() {
 				//if successfull turn or somebody won
 				if (msg == 'success' || (numberPassed && Number(msg) > 0) ) {
 
-					$(self).html(player_shape[player_number]);
+					$(self).html(player_shape[player_number].clone().show());
 
 				} 
 
@@ -50,6 +57,16 @@ $(function() {
 				
 			});
 		}
+	});
+
+
+	finish_game_button.on('click', function() {
+		socket.emit('finish_game', function(url) {
+			turn_info.html('Removing game from database. Redirecting...');
+			setTimeout(function() {
+				window.location.href = url;
+			}, 3000);
+		});
 	});
 
 
@@ -92,7 +109,7 @@ $(function() {
 				if (turn_player.length) {
 					for (var j = 0; j< turn_player.length; j++) {
 						turn_number = turn_player[j];
-						$('#'+turn_number).html(player_shape[i]);
+						$('#'+turn_number).html(player_shape[i].clone().show());
 					}
 				}
 
@@ -106,10 +123,18 @@ $(function() {
 
 
 	socket.on('player_won', function(player) {
-		console.log(player);
+		finish_game_button.hide();
 		turn(false);
 		turn_info.html('Player #'+player+' won! Use <a href="/">this link</a> to return on main page');
 		socket.disconnect()
+	});
+
+
+	socket.on('end_game', function(url) {
+		turn_info.html('Another player finished the game. Redirecting...');
+		setTimeout(function() {
+			window.location.href = url;
+		}, 3000);
 	});
 
 });
