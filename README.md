@@ -4,6 +4,8 @@ Implementation of this truly legendary game for Innovation Group with Express.js
 
 No database, instead of it app uses sample database wrapper, so if you want to switch, just tweak this wrapper.
 
+Field size can be changed in game, so feel free to experiment with fields more than 3x3 :)
+
 Installation:
 -------------
 
