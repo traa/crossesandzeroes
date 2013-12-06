@@ -17,7 +17,7 @@ var config = require('./config/config');
 
 //Controllers
 var gameController = new (require('./controllers/game'));
-var SocketController = require('./controllers/sockets');
+var SocketModule = require('./modules/socket');
 
 
 //Models
@@ -31,7 +31,8 @@ app.set('views', path.join(__dirname, config.views_path));
 app.set('view engine', config.view_engine);
 
 app.use(express.favicon());
-app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded());
 app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
@@ -89,10 +90,10 @@ server.listen(app.get('port'), function(){
 });
 
 
-socketController = new SocketController(io, db);
+socketModule = new SocketModule(io, db);
 
 //adding models and controllers required for sockets module
-socketController.addModels({
+socketModule.addModels({
   turn: turnModel,
   gameplayer: gamePlayerModel
 })
